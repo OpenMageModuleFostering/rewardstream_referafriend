@@ -56,12 +56,6 @@
                     <account_navigation>Rewardstream_Referafriend_Block_Customer_Account_Navigation</account_navigation>
                 </rewrite>
             </customer>
-            <sales>
-                <rewrite>
-                    <order_recent>Rewardstream_Referafriend_Block_Sales_Order_Recent</order_recent>
-                    <order_history>Rewardstream_Referafriend_Block_Sales_Order_History</order_history>
-                </rewrite>
-            </sales>
 
         </blocks>
         <events>
