@@ -64,12 +64,26 @@
             </sales>
 
         </blocks>
-        <rewrite>
-            <Rewardstream_Referafriend>
-                <from><![CDATA[#^/checkout/cart/couponPost#]]></from>
-                <to>/rewardstream/cart/couponPost</to>
-            </Rewardstream_Referafriend>
-        </rewrite>
+        <events>
+            <sales_order_invoice_pay>
+                <observers>
+                    <rewardstream_observers>
+                        <type>singleton</type>
+                        <class>rewardstream/observer</class>
+                        <method>salesOrderInvoicePayAfter</method>
+                    </rewardstream_observers>
+                </observers>
+            </sales_order_invoice_pay>
+            <sales_quote_collect_totals_before>
+                <observers>
+                    <rewardstream_observers_sales_quote_collect_totals_after>
+                        <type>singleton</type>
+                        <class>rewardstream/observer</class>
+                        <method>createDiscountCode</method>
+                    </rewardstream_observers_sales_quote_collect_totals_after>
+                </observers>
+            </sales_quote_collect_totals_before>
+        </events>
     </global>
     <adminhtml>
         <acl>
@@ -91,17 +105,6 @@
                 </admin>
             </resources>
         </acl>
-        <events>
-            <sales_order_invoice_pay>
-                <observers>
-                    <rewardstream_observers>
-                        <type>singleton</type>
-                        <class>rewardstream/observer</class>
-                        <method>salesOrderInvoicePayAfter</method>
-                    </rewardstream_observers>
-                </observers>
-            </sales_order_invoice_pay>
-        </events>
     </adminhtml>
     <frontend>
         <layout>
