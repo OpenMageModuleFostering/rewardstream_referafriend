@@ -1,0 +1,21 @@
+@media (min-width: 771px) {
+    .reward-image {
+        float: left;
+        width: 47%;
+        padding-right: 10px;
+    }
+    .rewardstream-cms {
+        float: right;
+        width: 53%;
+    }
+}
+
+@media (max-width: 770px) {
+    .reward-image {
+        padding-bottom: 10px;
+    }
+}
+
+.spark-refer-embed iframe {
+    height:400px !important
+}

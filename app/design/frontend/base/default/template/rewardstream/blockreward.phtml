@@ -1,0 +1,10 @@
+<?php 
+ $status = Mage::getStoreConfig('rewardstream_options/section_one/rewardstream_status');
+ $apiurl = 'https://' . Mage::getStoreConfig('rewardstream_options/section_one/rewardstream_api_url');
+ $apiSecret = Mage::getStoreConfig('rewardstream_options/section_one/rewardstream_secret_key');
+ $apiKey = Mage::getStoreConfig('rewardstream_options/section_one/rewardstream_api_key');
+if($status==1){
+	$authorization_header="Authorization: Basic ".$apiSecret;
+ echo $this->getLayout()->createBlock('cms/block')->setBlockId('refer-a-friend-checkout-success-content')->toHtml(); ?>
+
+<?php }?>

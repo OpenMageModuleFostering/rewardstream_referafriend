@@ -1,0 +1,11 @@
+<?php
+$status = Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_status' );
+$apiUrl = 'https://' . Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_api_url' );
+$apiSecret = Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_secret_key' );
+$apiKey = Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_api_key' );
+if ( $status == 1 ) {
+	$authorization_header = "Authorization: Basic " . $apiSecret;
+	?>
+	<script src="<?php echo $apiUrl?>/js/spark.v2.min.js?api_key=<?php echo $apiKey;?>"></script>
+
+<?php } ?>

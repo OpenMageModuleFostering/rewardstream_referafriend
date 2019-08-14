@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Rewardstream_Referafriend>
+            <active>true</active>  
+            <codePool>community</codePool> 
+        </Rewardstream_Referafriend>
+    </modules>
+</config>

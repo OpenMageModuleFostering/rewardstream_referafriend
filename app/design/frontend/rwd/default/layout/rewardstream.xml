@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+<!--Add script on checkout onepage success-->
+	<checkout_onepage_success>
+    <reference name="content">
+        <block type="rewardstream/script" name="rewardstream.checkout.details" template="rewardstream/script.phtml"/>
+		
+    
+        <block type="cms/block" name="refer_a_friend_checkout_success_content">
+            <action method="setBlockId"><block_id>refer-a-friend-checkout-success-content</block_id></action>
+        </block>
+  
+    </reference>
+   </checkout_onepage_success>
+<!--Add link in customer account menu-->
+	<customer_account translate="label">
+        <reference name="customer_account_navigation">
+           <action method="addCustomLink"><name>Send A Referral</name><path>rewardstream/index/refer</path><label>Refer A Friend</label></action>
+        </reference>
+    </customer_account>
+<!--Add content in the refer tab-->
+	 <rewardstream_index_refer>
+        <update handle="customer_account" />
+        <reference name="my.account.wrapper">
+            <block type="core/template" name="Rewardstream_Referafriend_content" template="rewardstream/rewardstream.phtml"/>
+        </reference>
+    </rewardstream_index_refer>
+  <default>
+        <reference name="head">
+            <action method="addJs">
+                <script>rewardstream/jquery-1.10.2.min.js</script>
+            </action>
+            <action method="addJs">
+                <script>rewardstream/noconflict.js</script>
+            </action>
+             <action method="addCss">
+                <stylesheet>rewardstream/css/rewardstream.css</stylesheet>
+            </action>
+        </reference>
+    </default>
+</layout>
