@@ -10,7 +10,7 @@
 
     <sections>
         <rewardstream_options translate="label" module="rewardstream">
-            <label>Refer a Friend by RewardStream</label>
+            <label>Refer a Friend</label>
             <tab>rewardstream</tab>
             <frontend_type>text</frontend_type>
             <sort_order>100</sort_order>
@@ -113,14 +113,14 @@
                         </rewardstream_refer_title>
 
                         <rewardstream_first_purchase>
-                            <label>First Purchase Required?</label>
+                            <label>Require Purchase</label>
                             <frontend_type>select</frontend_type>
                             <source_model>rewardstream/options</source_model>
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>If this parameter is enabled, customers must make an approved purchase before they can send a referral. We recommend enabling this parameter to reduce the potential for fraud in your referral program.</comment>
+                            <comment>If this is enabled, customers must make an approved purchase before they can send a referral. We recommend enabling this parameter to reduce the potential for fraud in your referral program.</comment>
                         </rewardstream_first_purchase>
 
                         <rewardstream_portal_launcher>

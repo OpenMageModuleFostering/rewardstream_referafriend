@@ -32,7 +32,7 @@ class Rewardstream_Referafriend_Model_Observer
 			$accountIdentifier = 'guestorder#' . $purchaseNumber;
 		}
 		else {
-			$accountIdentifier = "1000-" . $order->getCustomerId();
+			$accountIdentifier = $order->getCustomerId();
 		}
 
 		$items = $order->getAllVisibleItems();

@@ -31,7 +31,7 @@ class Rewardstream_Referafriend_IndexController extends Mage_Core_Controller_Fro
 		$region = $addressdata['region'];
 		$phone = $addressdata['phone'];
 		$country = $addressdata->getCountry();
-		$accountnumber = "1000-" . $id;
+		$accountnumber = $id;
 		$region_id = $addressdata['region_id'];
 		$regioncode = Mage::getModel( 'directory/region' )->load( $region_id );
 		$state_code = $regioncode->getCode(); //CA
@@ -120,7 +120,7 @@ class Rewardstream_Referafriend_IndexController extends Mage_Core_Controller_Fro
 		$phone = $addressdata['phone'];
 		$country = $addressdata->getCountry();
 		$state = $addressdata->getRegion();
-		$accountnumber = "1000-" . $id;
+		$accountnumber = $id;
 		$helper = Mage::helper( 'rewardstream' );
 		$apiurl = 'https://' . Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_api_url' );
 		$apiKey = Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_api_key' );
