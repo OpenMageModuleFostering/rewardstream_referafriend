@@ -1,21 +1,17 @@
 @media (min-width: 771px) {
-    .reward-image {
+    .public-referral-page-image {
         float: left;
         width: 47%;
         padding-right: 10px;
     }
-    .rewardstream-cms {
-        float: right;
+    .public-referral-page-instructions {
+        float: left;
         width: 53%;
     }
 }
 
 @media (max-width: 770px) {
-    .reward-image {
+    .public-referral-page-image {
         padding-bottom: 10px;
     }
-}
-
-.spark-refer-embed iframe {
-    height:400px !important
 }

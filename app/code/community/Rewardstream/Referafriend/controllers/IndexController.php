@@ -99,8 +99,7 @@ class Rewardstream_Referafriend_IndexController extends Mage_Core_Controller_Fro
 	}
 
 	//Refresh token for when reward member token expire than click to refresh button than apply this action
-	public function refreshtokenAction() {
-
+	public function refreshTokenAction() {
 		$rewardid = $this->getRequest()->getParam( 'reward_id' );
 		$id = $this->getRequest()->getParam( 'customer_id' );
 		$customer = Mage::getModel( 'customer/customer' )->load( $id );
@@ -131,32 +130,31 @@ class Rewardstream_Referafriend_IndexController extends Mage_Core_Controller_Fro
 		$authorization_header = "Basic " . $apiSecret;
 		$currenttime = date( 'Y-m-d H:i:s' );
 		$currentdate = date( "Ymd" );
-		$data = '<Data>
-		<FirstName>' . $firstname . '</FirstName>
-		<LastName>' . $lastname . '</LastName>
-		<EmailAddress>' . $email . '</EmailAddress>
-		<Account>
-		<Number>' . $accountnumber . '</Number>
-		<InternalIdentifier>' . $phone . '</InternalIdentifier>
-		<Status>A</Status>
-		<ActivationDate>' . $currentdate . '</ActivationDate>
-		</Account></Data>';
-		// TODO Re-add address if valid
-		//		<Address>
-		//		<StreetLine1>' . $street . '</StreetLine1>
-		//		<City>' . $city . '</City>
-		//		<State>' . $state_code . '</State>
-		//		<Country>' . $country . '</Country>
-		//		<ZipCode>' . $postcode . '</ZipCode>
-		//		</Address>
-		//		</Data>';
-		$result = $helper->getDataCallAPI( $url, $method, $data, $authorization_header );//Call SyncMemberApi for rewardstream update data
-		if ( $result ) {
+		$data = array(
+			"FirstName" => $firstname,
+			"LastName" => $lastname,
+			"EmailAddress" => $email,
+			"Account" => array(
+				"Number" => $accountnumber,
+				"InternalIdentifier" => $phone,
+				"Status" => "A",
+				"ActivationDate" => $currentdate
+			)
+			// TODO Re-add address if valid
+			//"Address" => array(
+			//	"StreetLine1" => $street,
+			//	"City" => $city,
+			//	"State" => $state_code,
+			//	"Country" => $country,
+			//	"ZipCode" => $postcode
+			//)
+		);
 
+		$result = $helper->getDataCallAPIJSON( $url, $method, json_encode($data), $authorization_header );//Call SyncMemberApi for rewardstream update data
+		if ( $result ) {
 			$arrayofjson = json_decode( $result, true );
-			if ($arrayofjson['Error'])
-			{
-				echo "Sorry, the Refer a Friend functionality is currently unavailable. Please try again later. (" . $arrayofjson['Error']['Message'] . ")";
+			if ($arrayofjson['Error']) {
+				echo json_encode($result);
 				exit();
 			}
 			else {
@@ -165,7 +163,6 @@ class Rewardstream_Referafriend_IndexController extends Mage_Core_Controller_Fro
 				$model->setAccess_token( $arrayofjson['access_token'] );
 				$model->setExpires_in( $arrayofjson['expires_in'] );
 				$model->setMember_id( $arrayofjson['Member']['Id'] );
-
 				$model->setFirstname( $arrayofjson['Member']['FirstName'] );
 				$model->setLastname( $arrayofjson['Member']['LastName'] );
 				$model->setEmail( $arrayofjson['Member']['EmailAddress'] );
@@ -173,14 +170,10 @@ class Rewardstream_Referafriend_IndexController extends Mage_Core_Controller_Fro
 				$model->setActivationdate( $currentdate );
 				$model->setActivationtime( $currenttime );
 				$model->save();
-				$token = $arrayofjson['access_token'];
-				$html = '<script type="text/javascript" src="' . $apiurl . '/js/spark.v2.min.js?api_key=' . $apiKey . '&token=' . $token . '"></script>';
-				$html .= '<a class="spark-refer">Refer a Friend</a>';
-				echo $html;
+				echo json_encode($result);
 			}
 		} else {
-
-			echo "Sorry, the Refer a Friend functionality is currently unavailable. Please try again later.";
+			echo "Sorry, the Refer a Friend functionality is currently unavailable. Please try again later. Back End";
 			exit();
 		}
 	}

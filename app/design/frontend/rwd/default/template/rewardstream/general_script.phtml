@@ -1,0 +1,5 @@
+<?php
+$apiUrl = 'https://' . Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_api_url' );
+$apiKey = Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_api_key' );
+?>
+<script src="<?php echo $apiUrl?>/js/spark.v2.min.js?api_key=<?php echo $apiKey;?>"></script>

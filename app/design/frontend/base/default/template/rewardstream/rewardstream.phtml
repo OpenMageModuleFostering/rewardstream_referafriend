@@ -1,201 +1,105 @@
 <?php
-    $status = Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_status' );
-    $title_name = Mage::getStoreConfig( 'rewardstream_options/section_two/rewardstream_refer_title' );
-    // If the user hasn't set the menu title name
-    if (empty($title_name)) {
-        $title_name = "Refer A Friend";
-    }
-if ( $status == 1 ) { ?>
-	<div class="rewardstream-referafriend">
-		<div class="page-title">
-			<h1><?php echo $title_name;?></h1>
-		</div>
+/**
+ * Beginning section is all data retrieval. 
+ *  - I don't want to mix php logic with html so I want to gather all the data first before applying them to the view
+ */
+$status = Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_status' );
+$title_name = Mage::getStoreConfig( 'rewardstream_options/section_two/rewardstream_refer_title' );
+$displayFirstPurchaseMessage = true;
+$pageRefresh = false;
 
-	<?php if ( Mage::getSingleton( 'customer/session' )->isLoggedIn() ) {
+// If the user hasn't set the menu title name
+if (empty($title_name)) {
+    $title_name = "Refer A Friend";
+}
 
+// If the magento app enabled?
+if ( $status == 1 ) { 
+	if ( Mage::getSingleton( 'customer/session' )->isLoggedIn() ) {
 		$customer = Mage::getSingleton( 'customer/session' )->getCustomer();
 		$email = $customer->getEmail();
-		$orderCollection = Mage::getModel( 'sales/order' )->getCollection();
-		$orderCollection->addFieldToFilter( 'customer_email', $email )->getFirstItem();
+        $orderCollection = Mage::getModel( 'sales/order' )->getCollection()
+            ->addFieldToFilter( 'customer_email', $email )
+            ->addFieldToFilter( 'status', array('complete', 'processing') );
 		$_orderCnt = $orderCollection->count();
         $first_purchase_required = Mage::getStoreConfig( 'rewardstream_options/section_two/rewardstream_first_purchase' );
 
-		if ( $_orderCnt == 0 && $first_purchase_required==1 ) { ?>
-			<div class="before-purchase">
-			    <?php echo $this->getLayout()->createBlock( 'cms/block' )->setBlockId( 'refer-a-friend-purchase-required' )->toHtml(); ?>
-			</div>
-        <?php } else {
-			foreach ( $orderCollection as $_order ) {
-				$statuscustomer[] = $_order->getStatusLabel();
-			}
+        // Show referral platform?
+        if ($first_purchase_required==2 || $_orderCnt > 0) {
+            // Disable display of first purchase
+            $displayFirstPurchaseMessage = false;
+            
+            $customerData = Mage::getSingleton( 'customer/session' )->getCustomer();
+            $id = $customerData->getId();
+            $apiUrl = 'https://' . Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_api_url' );
 
-			if ( in_array( "Complete", $statuscustomer ) || $first_purchase_required==2 ) {
+            $apiKey = Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_api_key' );
+            $collection = Mage::getModel( 'rewardstream/rewardstream' )->load( $id, 'customer_id' );
 
-				$customerData = Mage::getSingleton( 'customer/session' )->getCustomer();
-				$id = $customerData->getId();
-				$apiUrl = 'https://' . Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_api_url' );
+            $customerid = $collection['customer_id'];
+            $refreshTokenUrl = Mage::getUrl('rewardstream/index/refreshtoken');
 
-				$apiKey = Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_api_key' );
-				$collection = Mage::getModel( 'rewardstream/rewardstream' )->load( $id, 'customer_id' );
+            // Does the customer exist in our system already?
+            if ( $customerid == $id ) {
+                $accesstoken = $collection['access_token'];
+                $rewardid = $collection['reward_id'];
+                $activationtime = $collection['activationtime'];
+                $expiretime = date( 'Y-m-d H:i:s', strtotime( '+2 hour', strtotime( $activationtime ) ) );
+                $currenttime = date( 'Y-m-d H:i:s' );
 
-				$customerid = $collection['customer_id'];
-                $refreshTokenUrl = Mage::getUrl('rewardstream/index/refreshtoken');
-                $errorString = "Sorry, the Refer a Friend functionality is currently unavailable";
-
-				if ( $customerid == $id ) {
-					$accesstoken = $collection['access_token'];
-					$activationdate = $collection['activationdate'];
-					$expiretoken = $collection['expires_in'];
-					$rewardid = $collection['reward_id'];
-					$activationtime = $collection['activationtime'];
-					$expiretime = date( 'Y-m-d H:i:s', strtotime( '+2 hour', strtotime( $activationtime ) ) );
-					$currenttime = date( 'Y-m-d H:i:s' );
-
-					if ( isset( $accesstoken ) ) {
-                        if ( $currenttime > $expiretime ) { ?>
-							<div class="loading"></div>
-
-							<script type="text/javascript">
-
-								jQuery(document).ready(function () {
-									var reward_id = "<?php echo $rewardid?>";
-									var customer_id = "<?php echo $id?>";
-
-									jQuery.ajax ({
-                                        url: "<?php echo $refreshTokenUrl;?>",
-										data: {"reward_id": reward_id, "customer_id": customer_id},
-										type: 'post',
-										beforeSend: function ()
-										{
-											jQuery('.loading').html('<img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA)."wysiwyg/rewardstream/loading.gif" ?>"/>');
-										},
-										success: function (result)
-										{
-                                            var errorString = "<?php echo $errorString; ?>";
-											if (result.indexOf(errorString) > -1) {
-                                                jQuery('.loading').hide();
-                                                alert(result);
-                                            }
-											else
-											{
-												window.location.reload(true);
-											}
-										}
-
-									});
-								});
-
-							</script>
-
-						<?php } else if ( $accesstoken == "" ) { ?>
-
-							<div class="loading"></div>
-
-
-							<script type="text/javascript">
-
-								jQuery(document).ready(function ()
-								{
-									var reward_id = "<?php echo $rewardid?>";
-									var customer_id = "<?php echo $id?>";
-
-									jQuery.ajax({
-										url: "<?php echo $refreshTokenUrl;?>",
-										data: {"reward_id": reward_id, "customer_id": customer_id},
-										type: 'post',
-										beforeSend: function ()
-										{
-											jQuery('.loading').html('<img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA)."wysiwyg/rewardstream/loading.gif" ?>"/>');
-										},
-										success: function (result)
-										{
-                                            var errorString = "<?php echo $errorString; ?>";
-											if (result.indexOf(errorString) > -1) {
-                                                jQuery('.loading').hide();
-                                                alert(result);
-                                            }
-											else
-											{
-												window.location.reload(true);
-											}
-										}
-									});
-								});
-
-							</script>
-						<?php } else if ( $currenttime < $expiretime ) { ?>
-							<script type="text/javascript" src="<?php echo $apiUrl ?>/js/spark.v2.min.js?api_key=<?php echo $apiKey ?>&token=<?php echo $accesstoken; ?>"></script>
-
-							<?php echo $this->getLayout()->createBlock( 'cms/block' )->setBlockId( 'refer-a-friend-page-content' )->toHtml(); ?>
-						<?php }
-					}
-				} else {
-
-					$customerData->getFirstname();
-					$customerData->getLastname();
-					$customerData->getEmail();
-					$customerData->getAddress();
-					$address_id = $customerData->getDefaultBilling();
-
-					$addressdata = Mage::getModel( 'customer/address' )->load( $address_id );
-					$addressdata['street'];
-					$addressdata['city'];
-					$addressdata['postcode'];
-					$addressdata['region'];
-					$addressdata['telephone'];
-					?>
-
-
-					<div class="loading"></div>
-					<script type="text/javascript">
-
-						jQuery(document).ready(function () {
-							var customer_id = "<?php echo $id?>";
-
-							jQuery.ajax ({
-                                url: "<?php echo $refreshTokenUrl;?>",
-								data: {"customer_id": customer_id},
-								type: 'post',
-								beforeSend: function ()
-								{
-									jQuery('.loading').html('<img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA)."wysiwyg/rewardstream/loading.gif" ?>"/>');
-								},
-								success: function (result)
-								{
-                                    var errorString = "<?php echo $errorString; ?>";
-									if (result == "Please Contact to Merchant")
-									{
-										jQuery('.loading').hide();
-										alert("Please Contact to Merchant or Store Owner");
-									}
-                                    // If result message contains "Sorry, the Refer a Friend functionality is currently unavailable."
-                                    // Display the message
-                                    else if (result.indexOf(errorString) > -1) {
-                                        jQuery('.loading').hide();
-                                        alert(result);
-                                    }
-									else
-									{
-										window.location.reload(true);
-									}
-								}
-							});
-						});
-
-					</script>
-
-				<?php }?>
-			<?php } else { ?>
-				<div class="before-purchase">
-					<?php echo $this->getLayout()->createBlock( 'cms/block' )->setBlockId( 'refer-a-friend-purchase-required' )->toHtml(); ?>
-				</div>
-			<?php }
-		}
+                if ( isset( $accesstoken ) ) {
+                    if ( $currenttime > $expiretime || $accesstoken == "" ) { 
+                        // Need to call backend call to get token
+                        $pageRefresh = true;
+                    }
+                }
+            } else {
+                // Need to call backend call to get token
+                $pageRefresh = true;
+            }
+        }
 	}
 } else {
 	$customerLoginURL = $this->getBaseUrl() . "customer/account/login";
 	Mage::app()->getFrontController()->getResponse()->setRedirect( $customerLoginURL )->sendResponse();
 } ?>
 
+<!--Page Display-->
+<div class="rewardstream-referafriend">
+    <div class="page-title">
+        <h1><?php echo $title_name;?></h1>
+    </div>
 
+    <div id="content-error" class="error"></div>
+    <div class="loading"></div>
+
+    <!--Display First Purchase Message-->
+    <?php if ($displayFirstPurchaseMessage) { ?>
+        <div class="before-purchase">
+            <?php echo $this->getLayout()->createBlock( 'cms/block' )->setBlockId( 'refer-a-friend-purchase-required' )->toHtml(); ?>
+        </div>
+
+    <!--Display Embedded Referral Site-->
+    <?php } else if (!$pageRefresh) { ?>
+        <!--Load the page-->
+        <div id="refer-a-friend-platform">
+            <script type="text/javascript" src="<?php echo $apiUrl ?>/js/spark.v2.min.js?api_key=<?php echo $apiKey ?>&token=<?php echo $accesstoken ?>"></script>
+            <?php echo $this->getLayout()->createBlock( 'cms/block' )->setBlockId( 'refer-a-friend-page-content' )->toHtml(); ?>
+        </div>
+    <?php } ?>
+
+    <!--Loader and get the data-->
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            var reward_id = "<?php echo $rewardid?>";
+            var customer_id = "<?php echo $id?>";
+            var refreshTokenUrl = "<?php echo $refreshTokenUrl;?>";
+            var loaderUrl = "<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA)."wysiwyg/rewardstream/loading.gif" ?>";
+            var refreshPage = "<?php echo $pageRefresh?>";
+
+            if (refreshPage) {
+                RSUtility.refreshToken(reward_id, customer_id, refreshTokenUrl, "content-error", loaderUrl);
+            }
+        });
+    </script>
 </div>

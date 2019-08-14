@@ -83,14 +83,14 @@ class Rewardstream_Referafriend_CartController extends Mage_Checkout_CartControl
 		$result = $helper->getDataCallAPI( $apiurl . '/api/v2/custom/getOffer?api_key=' . $apiKey . '&code=' . $offerCode, "GET", false, "Basic " . $secretKey );
 		$responseData = json_decode( $result, true );
 
-		$rsOfferStatus = $responseData["Response"]['Status'];
+		$rsOfferStatus = $responseData['Status'];
 
 		// If valid RS offer code, create coupon discount if necessary. Otherwise just apply code as normal and it will only work if there's a Magento coupon code already
 		if ( $rsOfferStatus == "valid" ) {
 
-			$rsDiscountValue = $responseData["Response"]["Offer"]['Value'];
-			$rsOfferType = $responseData["Response"]["Offer"]['Type'];
-			$rsMinimumPurchase = $responseData["Response"]["Offer"]['MinimumPurchase'];
+			$rsDiscountValue = $responseData["Offer"]['Value'];
+			$rsOfferType = $responseData["Offer"]['Type'];
+			$rsMinimumPurchase = $responseData["Offer"]['MinimumPurchase'];
 			if ( $rsOfferType == "percent_off" ) {
 
 				$mgOfferType = "by_percent";

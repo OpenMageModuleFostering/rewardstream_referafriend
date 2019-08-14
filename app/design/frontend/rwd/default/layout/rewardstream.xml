@@ -33,6 +33,9 @@
             <action method="addJs">
                 <script>rewardstream/noconflict.js</script>
             </action>
+            <action method="addJs">
+                <script>rewardstream/RSUtility.js</script>
+            </action>
              <action method="addCss">
                 <stylesheet>rewardstream/css/rewardstream.css</stylesheet>
             </action>
