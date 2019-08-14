@@ -74,6 +74,91 @@ class Rewardstream_Referafriend_Model_Observer
 	}
 
 	/**
+	 * Check if the user of the coupon code is the correct user
+	 */
+	public function validateCouponCodeEmail( Varien_Event_Observer $observer ){
+		$status = Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_status' );
+
+		if ( $status == 1 ) {
+			$quote = $observer->getQuote();
+			$couponCode = $quote->getCouponCode();
+
+			// Is the coupon code used by the correct user?
+			if ( $couponCode && substr( $couponCode, 0, 3 ) === 'ref' && Mage::getSingleton('customer/session')->isLoggedIn()) {
+				$customer = Mage::getSingleton('customer/session')->getCustomer();
+				$responseData = $this->getOfferCode($couponCode);
+
+				if ($responseData['Referee']['Email'] !== $customer->getEmail()) {
+					Mage::getSingleton( 'checkout/session' )->addError( 'You are not eligible to use this coupon code.' );
+					$quote->setCouponCode('');
+					$quote->collectTotals()->save();
+				}
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Check if the user of the coupon code is the correct user
+	 */
+	public function validateCouponCodeEmail_BeforePlacingOrder( Varien_Event_Observer $observer ){
+		$status = Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_status' );
+
+		if ( $status == 1 ) {
+			$order = $observer->getEvent()->getOrder();
+			$email = $order->getCustomerEmail();
+			$couponCode = $order->getCouponCode();
+
+			// Is the coupon code used by the correct user?
+			if ( $couponCode && substr( $couponCode, 0, 3 ) === 'ref') {
+				$responseData = $this->getOfferCode($couponCode);
+
+				if ($responseData['Referee']['Email'] !== $email) {
+					Mage::throwException("You are not eligible to use this coupon code.");
+				}
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Check if the user has coupon code on login at checkout/onepage
+	 */
+	public function validateCouponCodeEmail_customerLogin( Varien_Event_Observer $observer ) {
+		$status = Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_status' );
+
+		if ( $status == 1 ) {
+			$quote = Mage::getSingleton('checkout/session')->getQuote();
+			$couponCode = $quote->getCouponCode();
+
+			// Is the coupon code used by the correct user?
+			if ( $couponCode && substr( $couponCode, 0, 3 ) === 'ref' && Mage::getSingleton('customer/session')->isLoggedIn()) {
+				$customer = Mage::getSingleton('customer/session')->getCustomer();
+				$responseData = $this->getOfferCode($couponCode);
+
+				if ($responseData['Referee']['Email'] !== $customer->getEmail()) {
+					$quote->setCouponCode('');
+					$quote->collectTotals()->save();
+				}
+			}
+		}
+	}
+
+	private function getOfferCode($couponCode) {
+		$helper = Mage::helper( 'rewardstream' );
+		$apiurl = 'https://' . Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_api_url' );
+		$apiKey = Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_api_key' );
+		$secretKey = Mage::getStoreConfig( 'rewardstream_options/section_one/rewardstream_secret_key' );
+
+		$result = $helper->getDataCallAPI( $apiurl . '/api/v2/custom/getOffer?api_key=' . $apiKey . '&code=' . $couponCode, "GET", false, "Basic " . $secretKey );
+		$responseData = json_decode( $result, true );
+
+		return $responseData;
+	}
+
+	/**
 	 * Redeem code (POST to RewardStream API). Handles both offer codes and reward codes
 	 *
 	 * @params $couponCode, $order

@@ -81,8 +81,31 @@
                         <class>rewardstream/observer</class>
                         <method>createDiscountCode</method>
                     </rewardstream_observers_sales_quote_collect_totals_after>
+                    <rewardstream_observers_validate_coupon_code>
+                        <type>singleton</type>
+                        <class>rewardstream/observer</class>
+                        <method>validateCouponCodeEmail</method>
+                    </rewardstream_observers_validate_coupon_code>
                 </observers>
             </sales_quote_collect_totals_before>
+            <sales_order_place_before>
+                <observers>
+                    <rewardstream_observers_validate_coupon_code_before_placing_order>
+                        <type>singleton</type>
+                        <class>rewardstream/observer</class>
+                        <method>validateCouponCodeEmail_BeforePlacingOrder</method>
+                    </rewardstream_observers_validate_coupon_code_before_placing_order>
+                </observers>
+            </sales_order_place_before>
+            <controller_action_predispatch_checkout_onepage_index>
+                <observers>
+                    <rewardstream_observers_validate_coupon_code_on_login>
+                        <type>singleton</type>
+                        <class>rewardstream/observer</class>
+                        <method>validateCouponCodeEmail_customerLogin</method>
+                    </rewardstream_observers_validate_coupon_code_on_login>
+                </observers>
+            </controller_action_predispatch_checkout_onepage_index>
         </events>
     </global>
     <adminhtml>
