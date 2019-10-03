@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/RewardStream_ReferAFriend",
+    "name": "OpenMageModuleFostering\/RewardStream_ReferAFriend",
     "type": "magento-module",
     "license": "RewardStream-Software-License-Agreement",
     "homepage": "",
     "description": "Get new customers by adding a fully automated word-of-mouth customer referral marketing solution to your store",
     "authors": [
-    {
-        "name": "RewardStream",
-        "email": "plugin-support@rewardstream.com"
-    }
-],
+        {
+            "name": "RewardStream",
+            "email": "plugin-support@rewardstream.com"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
